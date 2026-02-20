@@ -1,0 +1,7 @@
+pymupdf
+torch
+langchain
+langchain-core
+langchain-text-splitters
+pymilvus
+python-dotenv
