@@ -1,17 +1,17 @@
 services:
   backend:
-    build: .
+    build: ./backend
     container_name: backend
     ports:
       - "8000:8000"
     volumes:
       - ./app:/app
 
-models:
-  llm:
-    model: ai/qwen3:0.6B-Q4_0
-  embedding:
-    model: ai/qwen3-embedding:0.6B-F16
+# models:
+#   llm:
+#     model: ai/qwen3:0.6B-Q4_0
+#   embedding:
+#     model: ai/qwen3-embedding:0.6B-F16
   # milvus:
   #   image: milvusdb/milvus:v2.6.11
   #   container_name: milvus
