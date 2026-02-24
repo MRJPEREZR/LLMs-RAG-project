@@ -1,0 +1,33 @@
+services:
+  milvus:
+      image: milvusdb/milvus:v2.6.11
+      container_name: milvus
+      ports:
+        - "19530:19530"   # gRPC
+        - "9091:9091"     # REST / metrics
+        - "2379:2379"     # etcd client port
+      volumes:
+        - ./milvus_data:/var/lib/milvus
+        - ./milvus_data/configs/embedEtcd.yaml:/milvus/configs/embedEtcd.yaml
+        - ./milvus_data/configs/user.yaml:/milvus/configs/user.yaml
+      environment:
+        TZ: UTC
+        ETCD_USE_EMBED: "true"
+        ETCD_CONFIG_PATH: /milvus/configs/embedEtcd.yaml
+        COMMON_STORAGETYPE: local
+        DEPLOY_MODE: STANDALONE
+      command: ["milvus", "run", "standalone"]
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+        interval: 30s
+        timeout: 20s
+        retries: 3
+        start_period: 90s
+      security_opt:
+        - seccomp:unconfined
+
+# models:
+#   llm:
+#     model: ai/qwen3:0.6B-Q4_0
+#   embedding:
+#     model: ai/qwen3-embedding:0.6B-F16
