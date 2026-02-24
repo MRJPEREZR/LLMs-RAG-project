@@ -5,7 +5,8 @@ from app.core.config import MONGODB_DB_NAME, MONGODB_USR, MONGODB_PWD, MONGODB_H
 
 async def init_mongodb():
     client = AsyncMongoClient(
-        f"mongodb://{MONGODB_USR}:{MONGODB_PWD}@{MONGODB_HOST}:{MONGODB_PORT}"
+        f"mongodb://{MONGODB_USR}:{MONGODB_PWD}@{MONGODB_HOST}:{MONGODB_PORT}",
+        authSource="admin"
     )
     await init_beanie(
         database=client[MONGODB_DB_NAME],

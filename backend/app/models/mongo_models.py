@@ -9,8 +9,6 @@ class Message(BaseModel):
     timestamp: datetime = datetime.now(timezone.utc)
 
 class Conversation(Document):
-    user_id: Annotated[str, Indexed()]
-    session_id: Annotated[str, Indexed()]
     messages: List[Message] = Field(default_factory=list)
     title: Optional[str] = None
     metadata: dict = Field(default_factory=dict)
@@ -20,7 +18,7 @@ class Conversation(Document):
     class Settings:
         name = "conversations"
         indexes = [
-            [("user_id", 1), ("updated_at", -1)],
+            [("updated_at", -1)],
         ]
     
     def update_timestamp(self):

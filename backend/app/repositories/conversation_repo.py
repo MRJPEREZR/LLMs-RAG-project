@@ -1,52 +1,29 @@
-# class ConversationRepository:
-#     def __init__(self, mongodb_client):
-#         self.db = mongodb_client
-    
-#     async def get_or_create_conversation(self, user_id: str, session_id: str = None):
-#         # Logic to find existing or create new conversation
-#         pass
-    
-#     async def add_message(self, conversation_id: str, role: str, content: str):
-#         # Add message to MongoDB conversation
-#         pass
-    
-#     async def get_conversation_history(self, conversation_id: str, limit: int = 50):
-#         # Retrieve conversation with pagination
-#         pass
-
 from app.models.mongo_models import Conversation
 from typing import Optional, List
 from datetime import datetime, timezone
 from uuid import uuid4
 
 class ConversationRepository:
-    def __init__(self, db_client):
-        self.db_client = db_client
-        # If using Beanie ODM, you might not need db_client explicitly
     
     async def get_conversation(self, conversation_id: str) -> Optional[Conversation]:
         """Get a single conversation by ID"""
         return await Conversation.get(conversation_id)
     
-    async def list_user_conversations(
-        self, 
-        user_id: str, 
-        limit: int = 20, 
-        offset: int = 0
-    ) -> List[Conversation]:
-        """List conversations for a user"""
-        return await Conversation.find(
-            Conversation.user_id == user_id
-        ).sort(-Conversation.updated_at).skip(offset).limit(limit).to_list()
+    async def get_conversations(self, limit: int = 100, offset: int = 0, from_date: Optional[datetime] = None, to_date: Optional[datetime] = None) -> List[Conversation]:
+        """Get all conversations"""
+        query = Conversation.find_all()
+        if from_date:
+            query = query.where(Conversation.created_at >= from_date)
+        if to_date:
+            query = query.where(Conversation.created_at <= to_date)
+        return await query.skip(offset).limit(limit).to_list()
     
     async def create_conversation(
         self, 
-        user_id: str, 
         title: Optional[str] = None
     ) -> Conversation:
         """Create a new conversation"""
         conversation = Conversation(
-            user_id=user_id,
             title=title or "New Conversation",
             messages=[]
         )
