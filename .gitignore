@@ -4,4 +4,4 @@
 
 /mongodb_data
 
-/milvus_data/**
+**/milvus_data/
