@@ -5,7 +5,6 @@ from datetime import datetime
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=4000)
     conversation_id: Optional[str] = None
-    user_id: str = Field(..., min_length=1)
     stream: bool = False
     use_rag: bool = True
     temperature: Optional[float] = 0.7

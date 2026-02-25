@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.repositories.conversation_repo import ConversationRepository
-#from app.repositories.vector_repo import VectorRepository
-# from app.services.rag_service import RAGService
+from app.repositories.vector_repo import VectorRepository
+from app.services.rag_service import RAGService
 from app.models.pydantic_schemas import ChatRequest, ChatResponse
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -10,13 +10,11 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 async def chat(
     request: ChatRequest,
     conv_repo: ConversationRepository = Depends(),
-    # vector_repo: VectorRepository = Depends(),
-    # rag_service: RAGService = Depends()
+    vector_repo: VectorRepository = Depends(),
+    rag_service: RAGService = Depends()
 ):
     # 1. Get or create conversation from MongoDB
     conversation = await conv_repo.get_or_create_conversation(
-        user_id=request.user_id,
-        session_id=request.session_id
     )
     
     # 2. Save user message to MongoDB immediately

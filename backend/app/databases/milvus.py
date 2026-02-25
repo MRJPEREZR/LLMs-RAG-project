@@ -1,8 +1,10 @@
 from pymilvus import (
     connections,
     FieldSchema,
+    Function,
     CollectionSchema,
     DataType,
+    FunctionType,
     Collection,
     utility,
 )
@@ -24,14 +26,18 @@ def get_or_create_collection(collection_name: str, dim: int):
     fields = [
         FieldSchema(
             name="id",
-            dtype=DataType.INT64,
+            dtype=DataType.VARCHAR,
             is_primary=True,
             auto_id=True,
+            max_length=100,
         ),
         FieldSchema(
             name="content",
             dtype=DataType.VARCHAR,
             max_length=65535,
+            analyzer_params={"tokenizer": "standard", "filter": ["lowercase"]},
+            enable_match=True,  # Enable text matching
+            enable_analyzer=True,  # Enable text analysis
         ),
         FieldSchema(
             name="metadata",
@@ -45,23 +51,31 @@ def get_or_create_collection(collection_name: str, dim: int):
         FieldSchema(
             name="sparse_vector",
             dtype=DataType.SPARSE_FLOAT_VECTOR,
+            dim=1024 # Dimension for Qwen3-Embedding-0.6B
         ),
     ]
+
+    bm25_function = Function(
+            name="bm25",
+            function_type=FunctionType.BM25,
+            input_field_names=["content"],
+            output_field_names="sparse_vector",
+        )
 
     schema = CollectionSchema(fields, description="Hybrid search collection")
 
     collection = Collection(
         name=collection_name,
         schema=schema,
+        function=bm25_function
     )
 
     # Dense index (Inner Product for embeddings)
     collection.create_index(
         field_name="dense_vector",
         index_params={
-            "index_type": "HNSW",
+            "index_type": "FLAT",
             "metric_type": "IP",
-            "params": {"M": 16, "efConstruction": 200},
         },
     )
 
@@ -75,4 +89,5 @@ def get_or_create_collection(collection_name: str, dim: int):
     )
 
     collection.load()
+    logger(f"Collection '{collection_name}' created and loaded successfully")
     return collection
