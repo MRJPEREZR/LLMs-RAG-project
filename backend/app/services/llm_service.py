@@ -1,52 +1,20 @@
-# # app/services/llm/base.py
-# from abc import ABC, abstractmethod
-# from typing import List, Dict, Any, Optional, AsyncGenerator
-# from dataclasses import dataclass
+import requests
+import json
+from logger import default_logger as logger
 
-# @dataclass
-# class LLMResponse:
-#     text: str
-#     tokens_used: int
-#     model_used: str
-#     processing_time: float
-#     finish_reason: str
-#     metadata: Optional[Dict] = None
+from app.core.config import LLM_MODEL, LLM_URL
 
-# class BaseLLMService(ABC):
-#     """Abstract base class for LLM services"""
-    
-#     @abstractmethod
-#     async def generate(
-#         self,
-#         prompt: str,
-#         system_prompt: Optional[str] = None,
-#         temperature: float = 0.7,
-#         max_tokens: int = 1000,
-#         stop_sequences: Optional[List[str]] = None
-#     ) -> LLMResponse:
-#         """Generate a response from the LLM"""
-#         pass
-    
-#     @abstractmethod
-#     async def generate_with_history(
-#         self,
-#         messages: List[Dict[str, str]],
-#         temperature: float = 0.7,
-#         max_tokens: int = 1000
-#     ) -> LLMResponse:
-#         """Generate response with conversation history"""
-#         pass
-    
-#     @abstractmethod
-#     async def stream_generate(
-#         self,
-#         prompt: str,
-#         system_prompt: Optional[str] = None
-#     ) -> AsyncGenerator[str, None]:
-#         """Stream tokens as they're generated"""
-#         pass
-    
-#     @abstractmethod
-#     async def count_tokens(self, text: str) -> int:
-#         """Count tokens in text"""
-#         pass
+def chat(prompt: str) -> str:
+    """Simple chat call"""
+    headers = {
+        "Content-Type": "application/json"
+    }
+    response = requests.post({LLM_URL}, headers=headers, json={
+        "model": LLM_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False
+    })
+    return {
+        "status_code": response.status_code,
+        "content": response.json()['message']['content']
+    }

@@ -1,23 +1,37 @@
-# class VectorRepository:
-#     def __init__(self, milvus_client, embedding_service):
-#         self.milvus = milvus_client
-#         self.embedding_service = embedding_service
-    
-#     async def similarity_search(self, query: str, collection_name: str, limit: int = 5):
-#         # Generate embedding for query
-#         query_embedding = await self.embedding_service.embed(query)
-        
-#         # Search in Milvus
-#         collection = await self.milvus.get_collection(collection_name)
-#         results = collection.search(
-#             data=[query_embedding],
-#             anns_field="embedding",
-#             param={"metric_type": "IP", "params": {"nprobe": 10}},
-#             limit=limit,
-#             output_fields=["text", "metadata"]
-#         )
-#         return results
-    
-#     async def store_conversation_pair(self, conversation_id: str, user_message: str, assistant_response: str):
-#         # Store conversation embeddings in Milvus for future reference
-#         pass
+from pymilvus import AnnSearchRequest, RRFRanker
+from app.databases.milvus import connect, get_or_create_collection
+
+
+class VectorRepository:
+    def __init__(self, collection_name: str, dim: int):
+        connect()
+        self.collection = get_or_create_collection(collection_name, dim)
+        self.collection_name = collection_name
+
+    def hybrid_search(self, query: str, query_embedding: list[float], limit: int = 5):
+        sparse_search_params = {"metric_type": "BM25"}
+
+        sparse_request = AnnSearchRequest(
+            data=[query],
+            anns_field="sparse_vector",
+            param=sparse_search_params,
+            limit=limit,
+        )
+
+        dense_search_params = {"metric_type": "IP"}
+
+        dense_request = AnnSearchRequest(
+            data=[query_embedding],
+            anns_field="dense_vector",
+            param=dense_search_params,
+            limit=limit,
+        )
+
+        results = self.collection.hybrid_search(
+            requests=[sparse_request, dense_request],
+            ranker=RRFRanker(),
+            limit=limit,
+            output_fields=["content", "metadata"],
+        )
+
+        return results[0]

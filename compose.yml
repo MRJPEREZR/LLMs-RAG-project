@@ -11,6 +11,15 @@ services:
       - db
     env_file:
       - ./backend/.env
+    models:
+      - llm
+      - embedding
+      # llm:
+      #   endpoint_var: ${OLLAMA_HOST}
+      #   model_var: LLM_MODEL
+      # embedding:
+      #   endpoint_var: ${OLLAMA_HOST}/engines/llama.cpp/v1/
+      #   model_var: EMBEDDING_MODEL
   
   db:
     image: mongo:latest
@@ -23,6 +32,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: user
       MONGO_INITDB_ROOT_PASSWORD: pass
       MONGO_INITDB_DATABASE: chatbot
+
   milvus:
     image: milvusdb/milvus:v2.6.11
     container_name: milvus
@@ -50,8 +60,8 @@ services:
     security_opt:
       - seccomp:unconfined
 
-# models:
-#   llm:
-#     model: ai/qwen3:0.6B-Q4_0
-#   embedding:
-#     model: ai/qwen3-embedding:0.6B-F16
+models:
+  llm:
+    model: ai/qwen3:0.6B-Q4_0
+  embedding:
+    model: ai/qwen3-embedding:0.6B-F16
