@@ -8,6 +8,26 @@ from app.dependencies import get_conversation_repo
 
 router = APIRouter(prefix="/conversations", tags=["Conversations"])
 
+@router.post("/",response_model=ConversationSummary)
+async def create_conversation(
+    title: Optional[str] = None,
+    conversation_repo: ConversationRepository = Depends(get_conversation_repo)
+):
+    """
+    Create an empty conversation
+    """
+    conv = await conversation_repo.create_conversation()
+
+    return ConversationSummary(
+            id=str(conv.id),
+            title=conv.title or "New Conversation",
+            message_count=len(conv.messages),
+            last_message_at=conv.updated_at,
+            created_at=conv.created_at,
+            preview=None
+        )
+
+
 @router.get("/", response_model=List[ConversationSummary])
 async def list_conversations(
     limit: int = Query(20, ge=1, le=100),

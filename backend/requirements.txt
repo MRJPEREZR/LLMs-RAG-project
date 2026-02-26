@@ -4,3 +4,7 @@ fastapi[standard]
 
 pymongo
 beanie
+
+pymilvus
+
+requests

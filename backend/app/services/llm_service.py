@@ -19,11 +19,11 @@ class LLMService:
             "stream": False,
         }
 
-        logger.debug(f"Calling LLM endpoint: {self.url}")
+        logger.debug(f"Calling LLM endpoint: {self.url}/chat")
 
         try:
             response = requests.post(
-                self.url,
+                self.url + "/chat",
                 headers=headers,
                 json=payload,
                 timeout=60,

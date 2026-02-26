@@ -1,4 +1,4 @@
-from app.models.mongo_models import Conversation
+from app.models.mongo_models import Conversation, Message
 from typing import Optional, List
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -18,6 +18,21 @@ class ConversationRepository:
             query = query.where(Conversation.created_at <= to_date)
         return await query.skip(offset).limit(limit).to_list()
     
+    async def get_or_create_conversation(
+        self,
+        conversation_id: Optional[str] = None,
+        title: Optional[str] = None
+    ) -> Conversation:
+        """Get an existing conversation or create a new one"""
+
+        if conversation_id:
+            conversation = await self.get_conversation(conversation_id)
+            if conversation:
+                return conversation
+
+        conversation = await self.create_conversation()
+        return conversation
+
     async def create_conversation(
         self, 
         title: Optional[str] = None
@@ -41,12 +56,7 @@ class ConversationRepository:
         if not conversation:
             raise ValueError("Conversation not found")
         
-        message = {
-            "id": str(uuid4()),
-            "role": role,
-            "content": content,
-            "timestamp": datetime.now(timezone.utc)
-        }
+        message = Message(role=role, content=content)
         
         conversation.messages.append(message)
         conversation.updated_at = datetime.now(timezone.utc)

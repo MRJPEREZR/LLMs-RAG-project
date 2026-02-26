@@ -5,3 +5,5 @@
 /mongodb_data
 
 **/milvus_data/
+
+**/logs

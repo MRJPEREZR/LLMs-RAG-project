@@ -7,18 +7,20 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/code/app
+      - ./backend/logs:/code/logs
     depends_on:
       - db
+      - milvus
     env_file:
       - ./backend/.env
     models:
       - llm
       - embedding
       # llm:
-      #   endpoint_var: ${OLLAMA_HOST}
+      #   endpoint_var: http://localhost:12434
       #   model_var: LLM_MODEL
       # embedding:
-      #   endpoint_var: ${OLLAMA_HOST}/engines/llama.cpp/v1/
+      #   endpoint_var: http://localhost:12434/engines/llama.cpp/v1/
       #   model_var: EMBEDDING_MODEL
   
   db:

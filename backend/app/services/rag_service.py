@@ -1,12 +1,15 @@
+from fastapi import Depends
 from typing import Dict, Any, List
 from app.repositories.vector_repo import VectorRepository
 from app.services.embedding_service import EmbeddingService
 from app.services.llm_service import LLMService
-from app.services.llm_service import chat
 
 
 class RAGService:
-    def __init__(self, repo: VectorRepository, embedder: EmbeddingService, llm: LLMService):
+    def __init__(self, repo: VectorRepository = Depends(),
+                embedder: EmbeddingService = Depends(),
+                llm: LLMService = Depends()
+    ):
         self.repo = repo
         self.embedder = embedder
         self.llm = llm

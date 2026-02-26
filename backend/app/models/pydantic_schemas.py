@@ -12,13 +12,13 @@ class ChatRequest(BaseModel):
     metadata: Optional[dict] = {}
 
 class ChatResponse(BaseModel):
-    message: str
     conversation_id: str
     message_id: str
+    message: str
     timestamp: datetime
     sources: Optional[List[dict]] = None
     tokens_used: Optional[int] = None
-    processing_time: float
+    processing_time: Optional[float] = None
 
 class StreamChunk(BaseModel):
     chunk: str

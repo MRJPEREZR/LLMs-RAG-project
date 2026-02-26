@@ -16,11 +16,11 @@ class EmbeddingService:
             "input": text,
         }
 
-        logger.debug(f"Calling embedding endpoint: {self.url}")
+        logger.debug(f"Calling embedding endpoint: {self.url}/embeddings")
 
         try:
             response = requests.post(
-                self.url,
+                self.url + "/embeddings",
                 headers=headers,
                 json=payload,
                 timeout=30,

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.routes import root, chat, conversation
-from logger import setup_logger
+from app.core.logger import setup_logger
 
 logger = setup_logger("fastapi_app")
 app = FastAPI()
