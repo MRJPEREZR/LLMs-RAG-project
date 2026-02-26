@@ -2,12 +2,18 @@ from app.models.mongo_models import Conversation, Message
 from typing import Optional, List
 from datetime import datetime, timezone
 from uuid import uuid4
+from app.core.logger import default_logger as logger
+from beanie import PydanticObjectId
 
 class ConversationRepository:
     
     async def get_conversation(self, conversation_id: str) -> Optional[Conversation]:
         """Get a single conversation by ID"""
-        return await Conversation.get(conversation_id)
+        try:
+            obj_id = PydanticObjectId(conversation_id)
+        except ValueError:
+            return None
+        return await Conversation.get(obj_id)
     
     async def get_conversations(self, limit: int = 100, offset: int = 0, from_date: Optional[datetime] = None, to_date: Optional[datetime] = None) -> List[Conversation]:
         """Get all conversations"""
@@ -28,9 +34,12 @@ class ConversationRepository:
         if conversation_id:
             conversation = await self.get_conversation(conversation_id)
             if conversation:
+                logger.debug("Conversation found!")
                 return conversation
 
+        logger.debug("Conversation not found!")
         conversation = await self.create_conversation()
+
         return conversation
 
     async def create_conversation(
@@ -43,6 +52,7 @@ class ConversationRepository:
             messages=[]
         )
         await conversation.insert()
+        logger.debug("New Conversation created!")
         return conversation
     
     async def add_message(
@@ -50,7 +60,7 @@ class ConversationRepository:
         conversation_id: str, 
         role: str, 
         content: str
-    ) -> dict:
+    ) -> Message:
         """Add a message to a conversation"""
         conversation = await self.get_conversation(conversation_id)
         if not conversation:
@@ -61,7 +71,8 @@ class ConversationRepository:
         conversation.messages.append(message)
         conversation.updated_at = datetime.now(timezone.utc)
         await conversation.save()
-        
+        logger.debug("Message added!")
+
         return message
     
     async def delete_conversation(self, conversation_id: str) -> bool:

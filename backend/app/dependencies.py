@@ -43,7 +43,7 @@ async def get_llm_service(
         url: str = LLM_URL,
         model: str = LLM_MODEL
 ):
-    logger.info(f"Using embedding URL: {LLM_URL} and model: {LLM_MODEL}")
+    logger.info(f"Using llm URL: {LLM_URL} and model: {LLM_MODEL}")
     return LLMService(url, model)
 
 async def get_rag_service(

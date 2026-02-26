@@ -14,14 +14,12 @@ services:
     env_file:
       - ./backend/.env
     models:
-      - llm
-      - embedding
-      # llm:
-      #   endpoint_var: http://localhost:12434
-      #   model_var: LLM_MODEL
-      # embedding:
-      #   endpoint_var: http://localhost:12434/engines/llama.cpp/v1/
-      #   model_var: EMBEDDING_MODEL
+      llm:
+        endpoint_var: LLM_URL
+        model_var: LLM_MODEL
+      embedding:
+        endpoint_var: EMBEDDING_URL
+        model_var: EMBEDDING_MODEL
   
   db:
     image: mongo:latest

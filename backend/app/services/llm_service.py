@@ -6,7 +6,7 @@ class LLMService:
         self.url = url
         self.model = model
 
-    def chat(self, prompt: str) -> str:
+    async def chat(self, prompt: str) -> str:
         """Call LLM service and return generated text"""
 
         headers = {"Content-Type": "application/json"}
@@ -19,11 +19,11 @@ class LLMService:
             "stream": False,
         }
 
-        logger.debug(f"Calling LLM endpoint: {self.url}/chat")
+        logger.debug(f"Calling LLM endpoint: {self.url}/api/chat")
 
         try:
             response = requests.post(
-                self.url + "/chat",
+                self.url + "/api/chat",
                 headers=headers,
                 json=payload,
                 timeout=60,
@@ -31,6 +31,8 @@ class LLMService:
 
             response.raise_for_status()
             data = response.json()
+
+            logger.debug(f"LLM response: {data}")
 
             if "message" in data:
                 return data["message"]["content"]
