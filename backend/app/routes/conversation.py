@@ -124,3 +124,12 @@ async def delete_conversation(
     await conversation_repo.delete_conversation(conversation_id)
     
     return {"status": "success", "message": "Conversation deleted"}
+
+@router.get("/{conversation_id}/messages")
+async def get_messages(
+    conversation_id: str,
+    conversation_repo: ConversationRepository = Depends(get_conversation_repo),
+):
+    messages =  await conversation_repo.get_messages(conversation_id)
+
+    return {"status": "success", "messages": messages}

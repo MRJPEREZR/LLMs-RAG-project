@@ -8,6 +8,7 @@ from app.databases.milvus import connect
 from fastapi import HTTPException, Depends
 from app.core.logger import default_logger as logger
 
+from urllib.parse import urljoin
 from app.core.config import LLM_MODEL, LLM_URL, EMBEDDING_MODEL, EMBEDDING_URL
 
 async def get_conversation_repo():
@@ -36,14 +37,21 @@ async def get_embedding_service(
         url: str = EMBEDDING_URL,
         model: str = EMBEDDING_MODEL
 ):
-    logger.info(f"Using embedding URL: {EMBEDDING_URL} and model: {EMBEDDING_MODEL}")
+    if "/v1" in url.rstrip("/"):
+        url = url[:url.rfind("/v1")]
+    url=urljoin(url, "engines/llama.cpp/v1/")
+
+    logger.info(f"Using embedding URL: {url} and model: {model}")
     return EmbeddingService(url, model)
 
 async def get_llm_service(
         url: str = LLM_URL,
         model: str = LLM_MODEL
 ):
-    logger.info(f"Using llm URL: {LLM_URL} and model: {LLM_MODEL}")
+    if "/v1" in url.rstrip("/"):
+        url = url[:url.rfind("/v1")]
+
+    logger.info(f"Using llm URL: {url} and model: {model}")
     return LLMService(url, model)
 
 async def get_rag_service(

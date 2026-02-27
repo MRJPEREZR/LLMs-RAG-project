@@ -74,6 +74,19 @@ class ConversationRepository:
         logger.debug("Message added!")
 
         return message
+
+    async def get_messages(
+        self,
+        conversation_id: str
+    ) -> List[Message]:
+        """Get Message list per conversation"""
+
+        conversation = await self.get_conversation(conversation_id)
+
+        if not conversation:
+            return []
+
+        return conversation.messages or []
     
     async def delete_conversation(self, conversation_id: str) -> bool:
         """Delete a conversation"""
