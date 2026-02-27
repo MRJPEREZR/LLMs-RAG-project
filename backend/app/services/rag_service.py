@@ -4,6 +4,8 @@ from app.repositories.vector_repo import VectorRepository
 from app.services.embedding_service import EmbeddingService
 from app.services.llm_service import LLMService
 
+from app.core.logger import default_logger as logger
+
 
 class RAGService:
     def __init__(self, repo: VectorRepository = Depends(),
@@ -14,9 +16,12 @@ class RAGService:
         self.embedder = embedder
         self.llm = llm
 
-    def ask(self, query: str, top_k: int = 5) -> Dict[str, Any]:
-        query_embedding = self.embedder.embed(query)
+    async def ask(self, query: str, top_k: int = 5) -> Dict[str, Any]:
+        logger.info("Embedding query...")
+        query_embedding = await self.embedder.embed(query)
+        logger.info("Query embebed...")
 
+        logger.info("Searching in vector DB...")
         results = self.repo.search(query, query_embedding, limit=top_k)
 
         if not results:
@@ -28,10 +33,10 @@ class RAGService:
 
         prompt = self._build_prompt(query, context)
 
-        response = self.llm.chat(prompt)
+        response = await self.llm.chat(prompt)
 
         return {
-            "answer": response["content"],
+            "answer": response,
             "sources": self._extract_sources(results),
             "context_used": context,
         }

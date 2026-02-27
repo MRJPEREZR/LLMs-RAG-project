@@ -6,7 +6,7 @@ class EmbeddingService:
         self.url = url
         self.model = model
 
-    def embed(self, text: str) -> list[float]:
+    async def embed(self, text: str) -> list[float]:
         """Call embedding service and return vector"""
 
         headers = {"Content-Type": "application/json"}

@@ -29,8 +29,8 @@ class VectorRepository:
         )
 
         results = self.collection.hybrid_search(
-            requests=[sparse_request, dense_request],
-            ranker=RRFRanker(),
+            reqs=[sparse_request, dense_request],
+            rerank=RRFRanker(),
             limit=limit,
             output_fields=["content", "metadata"],
         )
