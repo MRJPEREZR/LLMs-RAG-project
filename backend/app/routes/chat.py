@@ -35,7 +35,7 @@ async def chat(
     else:
         assistant_response = await llm_service.chat(prompt=request.message)
         content = assistant_response
-        sources = {}
+        sources = []
     
     # 5. Save assistant response to MongoDB
     assistant_message = await conv_repo.add_message(
@@ -45,13 +45,12 @@ async def chat(
     )
 
     logger.debug(f"conversation_id {conversation.id}")
-    logger.debug(f"message_id {conversation.id}")
     logger.debug(f"content {content}")
     logger.debug(f"sources {sources}")
     
     return ChatResponse(
-        message_id=assistant_message.id,
+        conversation_id=str(conversation.id),
         message=content,
-        conversation_id=conversation.id,
+        timestamp=assistant_message.timestamp,
         sources=sources
     )

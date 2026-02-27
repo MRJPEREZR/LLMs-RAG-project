@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 from uuid import uuid4, UUID
 
 class Message(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
     role: str
     content: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

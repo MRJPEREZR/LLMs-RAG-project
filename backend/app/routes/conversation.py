@@ -10,13 +10,13 @@ router = APIRouter(prefix="/conversations", tags=["Conversations"])
 
 @router.post("/",response_model=ConversationSummary)
 async def create_conversation(
-    title: Optional[str] = None,
+    title: str = Body(..., embed=True),
     conversation_repo: ConversationRepository = Depends(get_conversation_repo)
 ):
     """
     Create an empty conversation
     """
-    conv = await conversation_repo.create_conversation()
+    conv = await conversation_repo.create_conversation(title)
 
     return ConversationSummary(
             id=str(conv.id),

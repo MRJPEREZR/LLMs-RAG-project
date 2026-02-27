@@ -13,7 +13,6 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     conversation_id: str
-    message_id: str
     message: str
     timestamp: datetime
     sources: Optional[List[dict]] = None
