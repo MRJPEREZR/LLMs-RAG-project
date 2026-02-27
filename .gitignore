@@ -3,6 +3,7 @@
 **/__pycache__/
 
 /mongodb_data
+**/volumes
 
 **/milvus_data/
 
